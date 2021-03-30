@@ -6,6 +6,9 @@ import Prismic from '@prismicio/client';
 import commonStyles from '../styles/common.module.scss';
 import styles from './home.module.scss';
 import { RichText } from 'prismic-dom';
+import { useEffect, useState } from 'react';
+
+import { FiCalendar, FiUsers } from 'react-icons/fi';
 
 interface Post {
   uid?: string;
@@ -27,8 +30,48 @@ interface HomeProps {
 }
 
 export default function Home({ postsPagination }: HomeProps) {
+  const [posts, setPosts] = useState(postsPagination.results);
+
+   const getMorePosts = async () => {
+    const newPosts = await fetch(postsPagination.next_page)
+      .then(result => result.json())
+      .then(data => {
+        return data.results.map((post: Post) => {
+          return {
+            uuid: post.uid,
+            first_publication_date: post.first_publication_date,
+            data: {
+              title: post.data.title,
+              subtitle: post.data.subtitle,
+              author: post.data.author,
+            }
+          }
+        });
+      });
+
+    setPosts([...posts, newPosts]);
+  }
+
   return (
-    <h1>Hello world</h1>
+    <div className={commonStyles.container}>
+      <ul className={styles.list}>
+        {posts.map(post => (
+          <li key={`${post.uid}${post.data.title}`} className={styles.post}>
+            <h3>{post.data.title}</h3>
+            <p>{post.data.subtitle}</p>
+            <div className={styles.info}>
+              <time>
+                <FiCalendar/>
+              </time>
+              <span>
+                <FiUsers/>
+                <p>{post.data.author}</p>
+              </span>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
   )
 }
 
@@ -37,11 +80,11 @@ export const getStaticProps = async () => {
   const postsResponse = await prismic.query([
     Prismic.predicates.at('document.type', 'posts')
   ], {
-    fetch: ['posts.title', 'posts.subtitle', 'posts.author', 'posts.banner'],
-    pageSize: 100
+    fetch: ['posts.title', 'posts.subtitle', 'posts.author'],
+    pageSize: 20
   });
 
-  const posts = postsResponse.results.map(post => {
+  const results = postsResponse.results.map(post => {
     return {
       uuid: post.uid,
       first_publication_date: post.first_publication_date,
@@ -57,7 +100,7 @@ export const getStaticProps = async () => {
     props: {
       postsPagination: {
         next_page: postsResponse.next_page,
-        posts,
+        results,
       },
     }
   }

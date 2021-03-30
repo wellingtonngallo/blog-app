@@ -29,7 +29,9 @@ interface PostProps {
 
 export default function Post({ post }: PostProps) {
   return (
-    <div>Teste</div>
+    <div className={styles.container}>
+
+    </div>
   )
 }
 

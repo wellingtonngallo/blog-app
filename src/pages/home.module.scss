@@ -1,1 +1,26 @@
-// TODO
+.list {
+  list-style: none;
+  text-align: justify;
+
+  .post {
+    & + .post {
+      margin-top: 3rem;
+    }
+
+    h3 {
+      margin-bottom: 0.5rem;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--title);
+      line-height: 2.125rem;
+    }
+
+    p {
+      font-size: 1.125rem;
+      line-height: 1.375rem;
+    }
+
+
+
+  }
+}
