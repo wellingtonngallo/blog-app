@@ -56,7 +56,7 @@ export default function Home({ postsPagination }: HomeProps) {
 
   return (
     <div className={`${commonStyles.container} ${styles.container}`}>
-      <img src="/images/logo.svg" alt="Logo"/>
+      <img src="/images/logo.svg" alt="logo"/>
       <ul className={styles.list}>
         {posts.map(post => (
           <li key={`${post.uid}`} className={styles.post}>
