@@ -2,7 +2,7 @@ import { GetStaticProps } from 'next';
 
 import { getPrismicClient } from '../services/prismic';
 import Prismic from '@prismicio/client';
-
+import Link from 'next/link';
 import commonStyles from '../styles/common.module.scss';
 import styles from './home.module.scss';
 import { RichText } from 'prismic-dom';
@@ -31,46 +31,57 @@ interface HomeProps {
 
 export default function Home({ postsPagination }: HomeProps) {
   const [posts, setPosts] = useState(postsPagination.results);
+  const [postsNextPage, setPostsNextPage] = useState(postsPagination.next_page);
 
    const getMorePosts = async () => {
-    const newPosts = await fetch(postsPagination.next_page)
-      .then(result => result.json())
-      .then(data => {
-        return data.results.map((post: Post) => {
-          return {
-            uuid: post.uid,
-            first_publication_date: post.first_publication_date,
-            data: {
-              title: post.data.title,
-              subtitle: post.data.subtitle,
-              author: post.data.author,
-            }
-          }
-        });
-      });
+    const postsResponse = await fetch(
+      postsPagination.next_page
+    ).then(response => response.json());
 
-    setPosts([...posts, newPosts]);
+    const newPost = postsResponse.results.map((post: Post) => ({
+      uid: post.uid,
+      first_publication_date: post.first_publication_date,
+      data: {
+        title: post.data.title,
+        subtitle: post.data.subtitle,
+        author: post.data.author,
+      },
+    }));
+
+    setPosts([...posts, ...newPost]);
+    setPostsNextPage(postsResponse.next_page);
   }
 
   return (
-    <div className={commonStyles.container}>
+    <div className={`${commonStyles.container} ${styles.container}`}>
+      <img src="/images/logo.svg" alt="Logo"/>
       <ul className={styles.list}>
         {posts.map(post => (
-          <li key={`${post.uid}${post.data.title}`} className={styles.post}>
-            <h3>{post.data.title}</h3>
-            <p>{post.data.subtitle}</p>
-            <div className={styles.info}>
-              <time>
-                <FiCalendar/>
-              </time>
-              <span>
-                <FiUsers/>
-                <p>{post.data.author}</p>
-              </span>
-            </div>
+          <li key={`${post.uid}`} className={styles.post}>
+            <Link href={`/post/${post.uid}`}>
+              <a>
+                <h3>{post.data.title}</h3>
+                <p>{post.data.subtitle}</p>
+                <div className={styles.info}>
+                  <time>
+                    <FiCalendar/>
+                    <p>{post.first_publication_date}</p>
+                  </time>
+                  <span>
+                    <FiUsers/>
+                    <p>{post.data.author}</p>
+                  </span>
+                </div>
+              </a>
+            </Link>
           </li>
         ))}
       </ul>
+      {postsNextPage && (
+        <button type="button" onClick={getMorePosts}>
+          Carregar mais posts
+        </button>
+      )}
     </div>
   )
 }
@@ -80,14 +91,17 @@ export const getStaticProps = async () => {
   const postsResponse = await prismic.query([
     Prismic.predicates.at('document.type', 'posts')
   ], {
-    fetch: ['posts.title', 'posts.subtitle', 'posts.author'],
-    pageSize: 20
+    fetch: ['posts.title', 'posts.subtitle', 'posts.author']
   });
 
   const results = postsResponse.results.map(post => {
     return {
-      uuid: post.uid,
-      first_publication_date: post.first_publication_date,
+      uid: post.uid,
+      first_publication_date: new Date(post.first_publication_date).toLocaleDateString('en-US', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+      }),
       data: {
         title: post.data.title,
         subtitle: post.data.subtitle,
