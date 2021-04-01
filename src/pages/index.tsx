@@ -3,6 +3,8 @@ import { GetStaticProps } from 'next';
 import { getPrismicClient } from '../services/prismic';
 import Prismic from '@prismicio/client';
 import Link from 'next/link';
+import { format } from 'date-fns';
+import ptBR from 'date-fns/locale/pt-BR';
 import commonStyles from '../styles/common.module.scss';
 import styles from './home.module.scss';
 import { RichText } from 'prismic-dom';
@@ -65,7 +67,17 @@ export default function Home({ postsPagination }: HomeProps) {
                 <div className={styles.info}>
                   <time>
                     <FiCalendar/>
-                    <p>{post.first_publication_date}</p>
+                    <p>
+                      {
+                        format(
+                          new Date(
+                            post.first_publication_date,
+                          ),
+                          'dd MMM yyyy',
+                          { locale: ptBR }
+                        )
+                      }
+                    </p>
                   </time>
                   <span>
                     <FiUsers/>
@@ -97,11 +109,7 @@ export const getStaticProps = async () => {
   const results = postsResponse.results.map(post => {
     return {
       uid: post.uid,
-      first_publication_date: new Date(post.first_publication_date).toLocaleDateString('en-US', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric'
-      }),
+      first_publication_date: post.first_publication_date,
       data: {
         title: post.data.title,
         subtitle: post.data.subtitle,
