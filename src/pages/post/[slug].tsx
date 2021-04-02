@@ -33,9 +33,10 @@ interface Post {
 
 interface PostProps {
   post: Post;
+  preview: Boolean;
 }
 
-export default function Post({ post }: PostProps): JSX.Element {
+export default function Post({ post, preview }: PostProps): JSX.Element {
   const router = useRouter();
 
   const readTime = useMemo(() => {
@@ -95,6 +96,8 @@ export default function Post({ post }: PostProps): JSX.Element {
         </article>
       </div>
       <Comments />
+
+      {preview && <button>Teste</button>}
     </>
   );
 }
@@ -120,9 +123,14 @@ export const getStaticPaths: GetStaticPaths = async () => {
   };
 };
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getStaticProps: GetStaticProps<PostProps> = async ({
+  params,
+  preview = false
+}) => {
   const { slug } = params;
 
+  console.log(slug);
+  console.log(slug);
   const prismic = getPrismicClient();
   const response = await prismic.getByUID('posts', String(slug), {});
 
@@ -143,6 +151,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   return {
     props: {
       post,
+      preview,
     },
   };
 };
