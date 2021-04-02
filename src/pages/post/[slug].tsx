@@ -1,13 +1,16 @@
 import { useMemo } from 'react';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { useRouter } from 'next/router';
+import { RichText } from 'prismic-dom';
 import { format } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
+
 import { FiCalendar, FiClock, FiUser } from 'react-icons/fi';
 import Prismic from '@prismicio/client';
-import { RichText } from 'prismic-dom';
 import { getPrismicClient } from '../../services/prismic';
 import Header from '../../components/Header';
+import { Comments } from '../../components/Comments';
+
 import commonStyles from '../../styles/common.module.scss';
 import styles from './post.module.scss';
 
@@ -56,7 +59,6 @@ export default function Post({ post }: PostProps): JSX.Element {
   return (
     <>
       <Header />
-
       <div className={styles.container}>
         <img src={post?.data.banner.url} alt={post?.data.author} />
         <article className={commonStyles.container}>
@@ -92,6 +94,7 @@ export default function Post({ post }: PostProps): JSX.Element {
           </main>
         </article>
       </div>
+      <Comments />
     </>
   );
 }
