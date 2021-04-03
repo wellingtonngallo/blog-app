@@ -11,6 +11,7 @@ import { RichText } from 'prismic-dom';
 import { useEffect, useState } from 'react';
 
 import { FiCalendar, FiUsers } from 'react-icons/fi';
+import { PreviewButton } from '../components/PreviewButton';
 
 interface Post {
   uid?: string;
@@ -96,7 +97,7 @@ export default function Home({ postsPagination, preview }: HomeProps) {
         </button>
       )}
 
-      {preview && <button>TESTE</button>}
+      {preview && <PreviewButton/>}
     </div>
   )
 }

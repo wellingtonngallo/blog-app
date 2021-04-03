@@ -13,6 +13,7 @@ import { Comments } from '../../components/Comments';
 
 import commonStyles from '../../styles/common.module.scss';
 import styles from './post.module.scss';
+import { PreviewButton } from '../../components/PreviewButton';
 
 interface Post {
   first_publication_date: string | null;
@@ -61,7 +62,9 @@ export default function Post({ post, preview }: PostProps): JSX.Element {
     <>
       <Header />
       <div className={styles.container}>
-        <img src={post?.data.banner.url} alt={post?.data.author} />
+        <div className={styles.containerBanner}>
+          <img src={post?.data.banner.url} alt={post?.data.author} />
+        </div>
         <article className={commonStyles.container}>
           <header>
             <h1>{router.isFallback ? 'Carregando...' : post?.data.title}</h1>
@@ -97,7 +100,7 @@ export default function Post({ post, preview }: PostProps): JSX.Element {
       </div>
       <Comments />
 
-      {preview && <button>Teste</button>}
+      {preview && <PreviewButton/>}
     </>
   );
 }
@@ -125,15 +128,18 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps<PostProps> = async ({
   params,
-  preview = false
+  preview = false,
+  previewData,
 }) => {
   const { slug } = params;
-
-  console.log(slug);
-  console.log(slug);
+  const { ref } = previewData;
   const prismic = getPrismicClient();
-  const response = await prismic.getByUID('posts', String(slug), {});
+  const response =
+  preview && ref
+    ? await prismic.getSingle('posts', { ref })
+    : await prismic.getByUID('posts', String(slug), {})
 
+  console.log(response);
   const post = {
     uid: response.uid,
     first_publication_date: response.first_publication_date,

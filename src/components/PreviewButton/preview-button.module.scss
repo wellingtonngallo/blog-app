@@ -1,0 +1,26 @@
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem 4rem;
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  button {
+    font-size: 1.125rem;
+    background: var(--title);
+    width: 780px;
+    height: 58px;
+
+    transition: filter 0.2s;
+
+    &:hover {
+      filter: brightness(0.8);
+    }
+  }
+}
+

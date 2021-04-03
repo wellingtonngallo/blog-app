@@ -3,6 +3,11 @@
     max-width: 100%;
   }
 
+  .containerBanner {
+    display: flex;
+    justify-content: center;
+  }
+
   article {
     header {
       margin-bottom: 4rem;
